@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://code.alibabatech.com/schema/dubbo 
+	http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+	
+	<!-- 提供方应用信息，用于计算依赖关系 -->  
+    <dubbo:application name="novel-mq" owner="Bake" organization="novel"/>
+
+ 	<!-- 使用zookeeper注册中心暴露服务地址 -->  
+    <dubbo:registry address="zookeeper://127.0.0.1:2181"/>
+
+    <!--uncomment this if you want to test dubbo's monitor-->
+    <!--<dubbo:monitor protocol="registry"/>-->
+	
+    <dubbo:protocol name="dubbo" port="-1" serialization="kryo" />
+    
+    <dubbo:protocol name="hessian" port="8890"/>
+    
+    <dubbo:provider delay="-1" timeout="1200000" retries="0"/>
+    <dubbo:consumer timeout="1200000" retries="0" /> 
+
+	<!-- 声明需要暴露的服务接口  -->
+   	<dubbo:service interface="org.novel.mq.facade.ProducerService" ref="producerService"  protocol="dubbo" validation="true"/>
+	
+	<!-- 具体的实现bean -->  
+   	<bean id="producerService" class="org.novel.mq.impl.ProducerServiceImpl" />
+   	
+   	<!-- 需要调用的服务 -->
+   	<dubbo:reference id="storeToHadoopService" interface="org.novel.store.facade.StoreToHadoopService"/>
+</beans>
